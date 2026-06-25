@@ -1,0 +1,34 @@
+databases:
+  - name: siga-pesv-db
+    plan: free
+    databaseName: pesv_db
+    user: pesv_user
+
+services:
+  - type: web
+    name: siga-pesv
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py cargar_catalogo_pesv && python manage.py crear_admin_inicial"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PESV_ENV
+        value: production
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: siga-pesv-db
+          property: connectionString
+      - key: DJANGO_SUPERUSER_USERNAME
+        value: admin
+      - key: DJANGO_SUPERUSER_EMAIL
+        value: admin@movilidadvillavicencio.gov.co
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false

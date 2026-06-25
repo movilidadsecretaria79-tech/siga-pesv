@@ -1,0 +1,18 @@
+CREDENCIALES INICIALES — SIGA-PESV
+====================================
+
+Se incluye una base de datos local (db.sqlite3) ya preparada con:
+  - El catálogo oficial de los 24 pasos del PESV y sus componentes verificables.
+  - Un usuario administrador temporal para el primer ingreso.
+
+Usuario:    admin
+Contraseña: PESV2026
+
+IMPORTANTE:
+1. Esta contraseña es solo para el primer ingreso en su computador local.
+   Cámbiela de inmediato desde /admin/ → Usuarios → admin → "Cambiar contraseña",
+   o desde la opción de cambio de contraseña de Django.
+2. Si va a instalar el aplicativo en un servidor (producción), NO copie este
+   archivo db.sqlite3: siga las instrucciones de la sección 3 del README.md
+   para crear una base de datos PostgreSQL nueva y un usuario administrador
+   con una contraseña segura propia.
