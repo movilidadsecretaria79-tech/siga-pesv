@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Historial - {{ componente.nombre }}{% endblock %}
+{% block content %}
+<h4 class="section-title">{{ componente.nombre }}</h4>
+<p class="text-muted">{{ empresa.nombre }}</p>
+<a href="{% url 'documentos:verificacion_requisitos' empresa.pk %}" class="btn btn-outline-secondary mb-3"><i class="bi bi-arrow-left"></i> Volver</a>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-3"><div class="card-header"><strong>Documentos soporte</strong></div>
+      <div class="list-group list-group-flush">
+        {% for d in documentos %}
+        <div class="list-group-item">
+          <a href="{{ d.archivo.url }}" target="_blank">{{ d.descripcion|default:d.archivo.name }}</a>
+          <div class="small text-muted">v{{ d.version }} · {{ d.fecha_carga|date:"d/m/Y H:i" }} {% if d.vigente %}<span class="badge bg-success">Vigente</span>{% else %}<span class="badge bg-secondary">Reemplazado</span>{% endif %}</div>
+        </div>
+        {% empty %}<div class="list-group-item text-muted">Sin documentos cargados.</div>{% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card mb-3"><div class="card-header"><strong>Evidencias de ejecución</strong></div>
+      <div class="list-group list-group-flush">
+        {% for e in evidencias %}
+        <div class="list-group-item">
+          <a href="{{ e.archivo.url }}" target="_blank">{{ e.descripcion|default:e.archivo.name }}</a>
+          <div class="small text-muted">{{ e.get_tipo_archivo_display }} · {{ e.fecha_carga|date:"d/m/Y H:i" }} {% if e.auditoria %}· Auditoría #{{ e.auditoria.pk }}{% endif %}</div>
+        </div>
+        {% empty %}<div class="list-group-item text-muted">Sin evidencias cargadas.</div>{% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

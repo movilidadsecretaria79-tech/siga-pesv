@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  @page { size: letter; margin: 1.6cm; }
+  body { font-family: Helvetica, Arial, sans-serif; font-size: 10pt; color: #222; }
+  h1 { font-size: 15pt; color: #0b3d91; text-align:center; margin-bottom:2px; }
+  h2 { font-size: 11pt; color: #0b3d91; border-bottom: 1px solid #0b3d91; padding-bottom:3px; margin-top:18px; }
+  .subtitulo { text-align:center; color:#555; font-size:9pt; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+  th, td { border: 1px solid #bbb; padding: 4px 6px; font-size: 9pt; text-align:left; vertical-align:top; }
+  th.label { width: 28%; background:#eef2fa; color:#0b3d91; }
+  .tbl-head th { background: #0b3d91; color: #fff; }
+  ul { margin: 4px 0 10px 18px; padding:0; }
+  .footer { margin-top: 20px; font-size: 8pt; color: #777; text-align:center; }
+  .badge { padding:2px 5px; border-radius:3px; color:#fff; font-size:8pt; }
+  .b-cumple{background:#1e8e3e;} .b-no{background:#c0392b;} .b-parcial{background:#e8a200;} .b-na{background:#777;}
+</style>
+</head>
+<body>
+  <h1>INFORME DE AUDITORÍA / VERIFICACIÓN PESV</h1>
+  <p class="subtitulo">Alcaldía de Villavicencio — Secretaría de Movilidad<br>Dirección de Planeación y Prospectiva</p>
+
+  <table>
+    <tr><th class="label">Empresa auditada</th><td>{{ auditoria.empresa.nombre }} (NIT {{ auditoria.empresa.nit }})</td></tr>
+    <tr><th class="label">Fecha de la auditoría</th><td>{{ auditoria.fecha_inicio|date:"d/m/Y" }}{% if auditoria.fecha_fin %} al {{ auditoria.fecha_fin|date:"d/m/Y" }}{% endif %}</td></tr>
+    <tr><th class="label">Duración</th><td>{% if auditoria.duracion_horas %}{{ auditoria.duracion_horas }} horas{% else %}No registrada{% endif %}</td></tr>
+    <tr><th class="label">Lugar</th><td>{{ auditoria.lugar|default:"—" }}</td></tr>
+    <tr><th class="label">Equipo auditor</th><td>{% for u in equipo_auditor %}{{ u.get_full_name|default:u.username }}{% if not forloop.last %}, {% endif %}{% endfor %}</td></tr>
+    <tr><th class="label">Pasos del PESV auditados</th><td>{% for p in pasos_auditados %}Paso {{ p.numero }}: {{ p.nombre }}{% if not forloop.last %}; {% endif %}{% endfor %}</td></tr>
+    <tr><th class="label">Estado de la auditoría</th><td>{{ auditoria.get_estado_display }}</td></tr>
+  </table>
+
+  {% if auditoria.resumen_ejecutivo %}
+  <h2>Resumen ejecutivo</h2>
+  <p>{{ auditoria.resumen_ejecutivo|linebreaksbr }}</p>
+  {% endif %}
+
+  <h2>Resultado de la lista de verificación</h2>
+  <table>
+    <tr class="tbl-head"><th>Paso</th><th>Componente</th><th>Calificación</th><th>Observaciones</th></tr>
+    {% for item in items %}
+    <tr>
+      <td>P{{ item.componente.paso_principal.numero }}</td>
+      <td>{{ item.componente.nombre }}</td>
+      <td><span class="badge {% if item.calificacion == 'CUMPLE' %}b-cumple{% elif item.calificacion == 'NO_CUMPLE' %}b-no{% elif item.calificacion == 'CUMPLE_PARCIAL' %}b-parcial{% else %}b-na{% endif %}">{{ item.get_calificacion_display }}</span></td>
+      <td>{{ item.observaciones|default:"" }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+
+  <h2>Documentos soporte revisados</h2>
+  <table>
+    <tr class="tbl-head"><th>Componente</th><th>Documento</th><th>Versión</th><th>Fecha del documento</th></tr>
+    {% for d in documentos_revisados %}
+    <tr><td>{{ d.componente.nombre }}</td><td>{{ d.descripcion|default:d.archivo.name }}</td><td>v{{ d.version }}</td><td>{{ d.fecha_documento|date:"d/m/Y"|default:"—" }}</td></tr>
+    {% empty %}<tr><td colspan="4">No se cargaron documentos soporte para los componentes auditados.</td></tr>{% endfor %}
+  </table>
+
+  <h2>Evidencias de ejecución revisadas</h2>
+  <table>
+    <tr class="tbl-head"><th>Componente</th><th>Tipo</th><th>Descripción</th><th>Fecha</th></tr>
+    {% for e in evidencias_revisadas %}
+    <tr><td>{{ e.componente.nombre }}</td><td>{{ e.get_tipo_archivo_display }}</td><td>{{ e.descripcion|default:"—" }}</td><td>{{ e.fecha_evidencia|date:"d/m/Y"|default:"—" }}</td></tr>
+    {% empty %}<tr><td colspan="4">No se cargaron evidencias de ejecución para los componentes auditados.</td></tr>{% endfor %}
+  </table>
+
+  <h2>Conformidades</h2>
+  <ul>{% for h in conformidades %}<li>{{ h.descripcion }}</li>{% empty %}<li>Ninguna registrada.</li>{% endfor %}</ul>
+
+  <h2>No conformidades</h2>
+  <ul>{% for h in no_conformidades %}<li>{{ h.descripcion }}</li>{% empty %}<li>Ninguna registrada.</li>{% endfor %}</ul>
+
+  <h2>Observaciones</h2>
+  <ul>{% for h in observaciones %}<li>{{ h.descripcion }}</li>{% empty %}<li>Ninguna registrada.</li>{% endfor %}</ul>
+
+  <h2>Recomendaciones</h2>
+  <ul>{% for h in recomendaciones %}<li>{{ h.descripcion }}</li>{% empty %}<li>Ninguna registrada.</li>{% endfor %}</ul>
+
+  <h2>Plan de mejoramiento</h2>
+  <table>
+    <tr class="tbl-head"><th>No conformidad relacionada</th><th>Acción de mejora</th><th>Responsable</th><th>Fecha compromiso</th><th>Estado</th></tr>
+    {% for acc in acciones_mejora %}
+    <tr>
+      <td>{{ acc.hallazgo.descripcion|truncatewords:15 }}</td>
+      <td>{{ acc.accion }}</td>
+      <td>{{ acc.responsable|default:"—" }}</td>
+      <td>{{ acc.fecha_compromiso|date:"d/m/Y" }}</td>
+      <td>{{ acc.get_estado_display }}</td>
+    </tr>
+    {% empty %}<tr><td colspan="5">Sin acciones de mejora registradas.</td></tr>{% endfor %}
+  </table>
+
+  <p class="footer">Informe generado el {{ fecha_generacion|date:"d/m/Y" }} a través del Sistema Integral de Gestión de Auditorías PESV (SIGA-PESV) — Secretaría de Movilidad de Villavicencio.</p>
+</body>
+</html>

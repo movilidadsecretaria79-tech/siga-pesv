@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}Informe de auditoría{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="section-title mb-0">Vista previa del informe de auditoría</h3>
+  <div>
+    <a href="{% url 'auditorias:detalle' auditoria.pk %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left"></i> Volver</a>
+    <a href="?formato=pdf" class="btn btn-pesv"><i class="bi bi-file-earmark-pdf"></i> Descargar PDF</a>
+  </div>
+</div>
+
+<div class="card shadow-sm">
+  <div class="card-body">
+    <div class="text-center mb-4">
+      <h4 style="color:var(--pesv-azul);">INFORME DE AUDITORÍA / VERIFICACIÓN PESV</h4>
+      <p class="text-muted">{{ INSTITUCION_NOMBRE }} · {{ INSTITUCION_DEPENDENCIA }}</p>
+    </div>
+
+    <table class="table table-bordered mb-4">
+      <tr><th style="width:220px;">Empresa auditada</th><td>{{ auditoria.empresa.nombre }} (NIT {{ auditoria.empresa.nit }})</td></tr>
+      <tr><th>Fecha de la auditoría</th><td>{{ auditoria.fecha_inicio|date:"d/m/Y" }}{% if auditoria.fecha_fin %} al {{ auditoria.fecha_fin|date:"d/m/Y" }}{% endif %}</td></tr>
+      <tr><th>Duración</th><td>{% if auditoria.duracion_horas %}{{ auditoria.duracion_horas }} horas{% else %}—{% endif %}</td></tr>
+      <tr><th>Lugar</th><td>{{ auditoria.lugar|default:"—" }}</td></tr>
+      <tr><th>Equipo auditor</th><td>{% for u in equipo_auditor %}{{ u.get_full_name|default:u.username }}{% if not forloop.last %}, {% endif %}{% endfor %}</td></tr>
+      <tr><th>Pasos del PESV auditados</th><td>{% for p in pasos_auditados %}Paso {{ p.numero }}: {{ p.nombre }}{% if not forloop.last %}; {% endif %}{% endfor %}</td></tr>
+      <tr><th>Estado</th><td>{{ auditoria.get_estado_display }}</td></tr>
+    </table>
+
+    {% if auditoria.resumen_ejecutivo %}
+    <h5 style="color:var(--pesv-azul);">Resumen ejecutivo</h5>
+    <p>{{ auditoria.resumen_ejecutivo|linebreaks }}</p>
+    {% endif %}
+
+    <h5 style="color:var(--pesv-azul);">Resultado de la lista de verificación</h5>
+    <table class="table table-sm table-bordered mb-4">
+      <thead class="table-light"><tr><th>Paso</th><th>Componente</th><th>Calificación</th><th>Observaciones</th></tr></thead>
+      <tbody>
+      {% for item in items %}
+        <tr>
+          <td>P{{ item.componente.paso_principal.numero }}</td>
+          <td>{{ item.componente.nombre }}</td>
+          <td>
+            <span class="badge {% if item.calificacion == 'CUMPLE' %}badge-cumple{% elif item.calificacion == 'NO_CUMPLE' %}badge-no-cumple{% elif item.calificacion == 'CUMPLE_PARCIAL' %}badge-parcial{% else %}badge-na{% endif %}">{{ item.get_calificacion_display }}</span>
+          </td>
+          <td>{{ item.observaciones|default:"" }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    <h5 style="color:var(--pesv-azul);">Documentos soporte revisados</h5>
+    <table class="table table-sm table-bordered mb-4">
+      <thead class="table-light"><tr><th>Componente</th><th>Documento</th><th>Versión</th><th>Fecha del documento</th></tr></thead>
+      <tbody>
+      {% for d in documentos_revisados %}
+        <tr><td>{{ d.componente.nombre }}</td><td>{{ d.descripcion|default:d.archivo.name }}</td><td>v{{ d.version }}</td><td>{{ d.fecha_documento|date:"d/m/Y"|default:"—" }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="text-center text-muted">No se cargaron documentos soporte para los componentes auditados.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+
+    <h5 style="color:var(--pesv-azul);">Evidencias de ejecución revisadas</h5>
+    <table class="table table-sm table-bordered mb-4">
+      <thead class="table-light"><tr><th>Componente</th><th>Tipo</th><th>Descripción</th><th>Fecha</th></tr></thead>
+      <tbody>
+      {% for e in evidencias_revisadas %}
+        <tr><td>{{ e.componente.nombre }}</td><td>{{ e.get_tipo_archivo_display }}</td><td>{{ e.descripcion|default:"—" }}</td><td>{{ e.fecha_evidencia|date:"d/m/Y"|default:"—" }}</td></tr>
+      {% empty %}<tr><td colspan="4" class="text-center text-muted">No se cargaron evidencias de ejecución para los componentes auditados.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h5 style="color:#1e8e3e;">Conformidades</h5>
+        <ul>{% for h in conformidades %}<li>{{ h.descripcion }}</li>{% empty %}<li class="text-muted">Ninguna registrada</li>{% endfor %}</ul>
+        <h5>Observaciones</h5>
+        <ul>{% for h in observaciones %}<li>{{ h.descripcion }}</li>{% empty %}<li class="text-muted">Ninguna registrada</li>{% endfor %}</ul>
+      </div>
+      <div class="col-md-6">
+        <h5 style="color:#c0392b;">No conformidades</h5>
+        <ul>{% for h in no_conformidades %}<li>{{ h.descripcion }}</li>{% empty %}<li class="text-muted">Ninguna registrada</li>{% endfor %}</ul>
+        <h5>Recomendaciones</h5>
+        <ul>{% for h in recomendaciones %}<li>{{ h.descripcion }}</li>{% empty %}<li class="text-muted">Ninguna registrada</li>{% endfor %}</ul>
+      </div>
+    </div>
+
+    <h5 style="color:var(--pesv-azul);">Plan de mejoramiento</h5>
+    <table class="table table-sm table-bordered">
+      <thead class="table-light"><tr><th>No conformidad relacionada</th><th>Acción de mejora</th><th>Responsable</th><th>Fecha compromiso</th><th>Estado</th></tr></thead>
+      <tbody>
+      {% for acc in acciones_mejora %}
+        <tr>
+          <td>{{ acc.hallazgo.descripcion|truncatewords:15 }}</td>
+          <td>{{ acc.accion }}</td>
+          <td>{{ acc.responsable|default:"—" }}</td>
+          <td>{{ acc.fecha_compromiso|date:"d/m/Y" }}</td>
+          <td>{{ acc.get_estado_display }}</td>
+        </tr>
+      {% empty %}<tr><td colspan="5" class="text-center text-muted">Sin acciones de mejora registradas</td></tr>{% endfor %}
+      </tbody>
+    </table>
+
+    <p class="text-muted small mt-4">Informe generado el {{ fecha_generacion|date:"d/m/Y" }} a través del Sistema Integral de Gestión de Auditorías PESV — Secretaría de Movilidad de Villavicencio.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+{% block content %}
+<h3 class="section-title">Panel de control — SIGA-PESV</h3>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card card-kpi"><div class="card-body"><div class="kpi-num">{{ total_empresas }}</div>Empresas activas</div></div></div>
+  <div class="col-md-3"><div class="card card-kpi"><div class="card-body"><div class="kpi-num">{{ auditorias_en_proceso }}</div>Auditorías en proceso</div></div></div>
+  <div class="col-md-3"><div class="card card-kpi exito"><div class="card-body"><div class="kpi-num">{{ auditorias_cerradas }}</div>Auditorías cerradas</div></div></div>
+  <div class="col-md-3"><div class="card card-kpi alerta"><div class="card-body"><div class="kpi-num">{{ no_conformidades_abiertas }}</div>No conformidades abiertas</div></div></div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card card-kpi alerta"><div class="card-body"><div class="kpi-num">{{ acciones_vencidas }}</div>Acciones de mejora vencidas</div></div></div>
+  <div class="col-md-3"><div class="card card-kpi"><div class="card-body"><div class="kpi-num">{{ acciones_pendientes }}</div>Acciones de mejora pendientes</div></div></div>
+  <div class="col-md-3"><div class="card card-kpi alerta"><div class="card-body"><div class="kpi-num">{{ vehiculos_soat_vencido }}</div>Vehículos con SOAT vencido</div></div></div>
+  <div class="col-md-3"><div class="card card-kpi alerta"><div class="card-body"><div class="kpi-num">{{ conductores_con_alertas }}</div>Conductores con alertas</div></div></div>
+</div>
+
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header d-flex justify-content-between"><strong><i class="bi bi-calendar3"></i> Próximas visitas programadas</strong>
+        <a href="{% url 'programa:lista' %}" class="small">Ver programa anual</a></div>
+      <ul class="list-group list-group-flush">
+        {% for v in proximas_visitas %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span>{{ v.empresa.nombre }}</span><span class="badge bg-secondary">{{ v.fecha_programada|date:"d/m/Y" }}</span>
+        </li>
+        {% empty %}<li class="list-group-item text-muted">No hay visitas próximas programadas.</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header d-flex justify-content-between"><strong><i class="bi bi-exclamation-triangle"></i> Acciones de mejora próximas a vencer</strong>
+        <a href="{% url 'matriz' %}" class="small">Ver matriz completa</a></div>
+      <ul class="list-group list-group-flush">
+        {% for a in acciones_proximas %}
+        <li class="list-group-item d-flex justify-content-between">
+          <span>{{ a.hallazgo.auditoria.empresa.nombre }} — {{ a.accion|truncatewords:10 }}</span>
+          <span class="badge {% if a.vencida %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ a.fecha_compromiso|date:"d/m/Y" }}</span>
+        </li>
+        {% empty %}<li class="list-group-item text-muted">No hay acciones pendientes.</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-md-4"><a href="{% url 'programa:crear' %}" class="btn btn-pesv w-100"><i class="bi bi-calendar-plus"></i> Crear programa anual</a></div>
+  <div class="col-md-4"><a href="{% url 'empresas:crear' %}" class="btn btn-pesv w-100"><i class="bi bi-building-add"></i> Registrar empresa</a></div>
+  <div class="col-md-4"><a href="{% url 'auditorias:crear' %}" class="btn btn-pesv w-100"><i class="bi bi-clipboard2-plus"></i> Nueva auditoría</a></div>
+</div>
+{% endblock %}

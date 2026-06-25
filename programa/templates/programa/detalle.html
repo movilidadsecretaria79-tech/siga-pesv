@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ programa }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+  <div>
+    <h3 class="section-title mb-0">{{ programa }}</h3>
+    <span class="badge bg-secondary">{{ programa.get_estado_display }}</span>
+  </div>
+  <div class="btn-group">
+    <a href="{% url 'programa:editar' programa.pk %}" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i> Editar programa</a>
+    <a href="{% url 'programa:visita_crear' programa.pk %}" class="btn btn-pesv"><i class="bi bi-calendar-plus"></i> Programar visita</a>
+  </div>
+</div>
+
+<p>{{ programa.objetivo }}</p>
+{% if programa.alcance %}<p class="text-muted"><strong>Alcance:</strong> {{ programa.alcance }}</p>{% endif %}
+
+<h5 class="mt-4">Cronograma de visitas</h5>
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-pesv table-hover mb-0">
+      <thead><tr>
+        <th>Empresa</th><th>Fecha programada</th><th>Duración est.</th><th>Pasos a evaluar</th><th>Equipo auditor</th><th>Estado</th><th></th>
+      </tr></thead>
+      <tbody>
+      {% for v in visitas %}
+        <tr>
+          <td><a href="{% url 'empresas:detalle' v.empresa.pk %}">{{ v.empresa.nombre }}</a></td>
+          <td>{{ v.fecha_programada|date:"d/m/Y" }}</td>
+          <td>{{ v.duracion_horas_estimada }} h</td>
+          <td>{{ v.pasos_a_evaluar.count }} paso(s)</td>
+          <td>{% for u in v.equipo_auditor.all %}<span class="badge bg-light text-dark border">{{ u.get_full_name|default:u.username }}</span>{% endfor %}</td>
+          <td><span class="badge bg-secondary">{{ v.get_estado_display }}</span></td>
+          <td>
+            <a href="{% url 'programa:visita_editar' v.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            <a href="{% url 'auditorias:crear' %}?visita={{ v.pk }}" class="btn btn-sm btn-pesv">Iniciar auditoría</a>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="text-center text-muted py-4">Sin visitas programadas todavía.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

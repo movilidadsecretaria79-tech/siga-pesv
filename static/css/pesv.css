@@ -1,0 +1,33 @@
+:root{
+  --pesv-azul: #0b3d91;
+  --pesv-azul-claro: #1e6fd9;
+  --pesv-negro: #0a0a0a;
+  --pesv-gris: #f4f6f9;
+}
+body{ background: var(--pesv-gris); }
+.navbar-pesv{ background: var(--pesv-negro) !important; border-bottom: 3px solid var(--pesv-azul-claro); }
+.navbar-pesv .nav-link{ color:#fff !important; }
+.navbar-pesv .nav-link.active{ color: var(--pesv-azul-claro) !important; font-weight:600; }
+.navbar-pesv .navbar-brand img{ height: 42px; }
+.brand-text{ color:#fff; font-weight:700; font-size:1.05rem; line-height:1.1; }
+.brand-text small{ display:block; color:#bcd4f7; font-weight:400; font-size:.72rem; }
+
+.card-kpi{ border:none; border-left:5px solid var(--pesv-azul-claro); box-shadow:0 1px 4px rgba(0,0,0,.08); }
+.card-kpi .kpi-num{ font-size:2rem; font-weight:700; color: var(--pesv-azul); }
+.card-kpi.alerta{ border-left-color:#c0392b; }
+.card-kpi.alerta .kpi-num{ color:#c0392b; }
+.card-kpi.exito{ border-left-color:#1e8e3e; }
+.card-kpi.exito .kpi-num{ color:#1e8e3e; }
+
+.section-title{ color: var(--pesv-azul); font-weight:700; border-bottom:2px solid var(--pesv-azul-claro); padding-bottom:.35rem; margin-bottom:1rem;}
+.btn-pesv{ background: var(--pesv-azul); border-color: var(--pesv-azul); color:#fff; }
+.btn-pesv:hover{ background: var(--pesv-azul-claro); border-color: var(--pesv-azul-claro); color:#fff; }
+.table-pesv thead{ background: var(--pesv-azul); color:#fff; }
+.badge-cumple{ background:#1e8e3e; }
+.badge-no-cumple{ background:#c0392b; }
+.badge-parcial{ background:#e8a200; }
+.badge-na{ background:#6c757d; }
+.login-card{ max-width:420px; margin: 8vh auto; }
+.login-card .card{ border:none; box-shadow:0 4px 18px rgba(0,0,0,.18); border-radius:14px; }
+.footer-pesv{ color:#6c757d; font-size:.8rem; padding:2rem 0 1rem; text-align:center; }
+.dot-row{ height:6px; background: repeating-linear-gradient(90deg,#1e6fd9 0 6px, transparent 6px 16px); opacity:.5; }

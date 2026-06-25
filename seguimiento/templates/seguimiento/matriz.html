@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Matriz de seguimiento{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <h3 class="section-title mb-0">Matriz de seguimiento a auditorías y planes de mejoramiento</h3>
+  <a href="?{% if request.GET.urlencode %}{{ request.GET.urlencode }}&{% endif %}formato=xlsx" class="btn btn-pesv"><i class="bi bi-file-earmark-excel"></i> Exportar a Excel</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <select name="empresa" class="form-select">
+      <option value="">Todas las empresas</option>
+      {% for e in empresas %}<option value="{{ e.pk }}" {% if request.GET.empresa == e.pk|stringformat:"s" %}selected{% endif %}>{{ e.nombre }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3">
+    <select name="estado" class="form-select">
+      <option value="">Todos los estados</option>
+      {% for v,l in estados %}<option value="{{ v }}" {% if request.GET.estado == v %}selected{% endif %}>{{ l }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2"><button class="btn btn-outline-primary w-100">Filtrar</button></div>
+</form>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-pesv table-hover mb-0">
+      <thead><tr>
+        <th>Empresa</th><th>Fecha auditoría</th><th>Tipo</th><th>Hallazgo</th><th>Acción de mejora</th><th>Responsable</th><th>Compromiso</th><th>Estado</th>
+      </tr></thead>
+      <tbody>
+      {% for acc in acciones %}
+        <tr class="{% if acc.vencida %}table-danger{% endif %}">
+          <td><a href="{% url 'auditorias:detalle' acc.hallazgo.auditoria.pk %}">{{ acc.hallazgo.auditoria.empresa.nombre }}</a></td>
+          <td>{{ acc.hallazgo.auditoria.fecha_inicio|date:"d/m/Y" }}</td>
+          <td>{{ acc.hallazgo.get_tipo_display }}</td>
+          <td>{{ acc.hallazgo.descripcion|truncatewords:12 }}</td>
+          <td>{{ acc.accion|truncatewords:14 }}</td>
+          <td>{{ acc.responsable|default:"—" }}</td>
+          <td>{{ acc.fecha_compromiso|date:"d/m/Y" }}</td>
+          <td><span class="badge {% if acc.estado == 'CUMPLIDA' %}bg-success{% elif acc.estado == 'VENCIDA' %}bg-danger{% else %}bg-warning text-dark{% endif %}">{{ acc.get_estado_display }}</span></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-4">No hay registros de seguimiento todavía.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

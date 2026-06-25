@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Programa anual de verificación{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="section-title mb-0">Programa anual de verificación PESV</h3>
+  <a href="{% url 'programa:crear' %}" class="btn btn-pesv"><i class="bi bi-plus-circle"></i> Nuevo programa</a>
+</div>
+<div class="row g-3">
+  {% for p in programas %}
+  <div class="col-md-4">
+    <div class="card shadow-sm h-100">
+      <div class="card-body">
+        <h5>{{ p }}</h5>
+        <span class="badge bg-secondary mb-2">{{ p.get_estado_display }}</span>
+        <p class="text-muted small">{{ p.objetivo|truncatewords:25 }}</p>
+        <p class="small"><i class="bi bi-calendar3"></i> {{ p.visitas.count }} visita(s) programada(s)</p>
+        <a href="{% url 'programa:detalle' p.pk %}" class="btn btn-sm btn-pesv">Ver cronograma</a>
+        <a href="{% url 'programa:editar' p.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted">No hay programas anuales registrados. Cree el primero con el botón superior.</p>
+  {% endfor %}
+</div>
+{% endblock %}

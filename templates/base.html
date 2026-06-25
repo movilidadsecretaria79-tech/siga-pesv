@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}SIGA-PESV{% endblock %} · Secretaría de Movilidad de Villavicencio</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<link rel="stylesheet" href="{% static 'css/pesv.css' %}">
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% if user.is_authenticated %}
+<nav class="navbar navbar-expand-lg navbar-pesv sticky-top">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'dashboard' %}">
+      <img src="{% static INSTITUCION_LOGO %}" onerror="this.style.display='none'" alt="Logo">
+      <span class="brand-text">SIGA-PESV<small>{{ INSTITUCION_DEPENDENCIA }}</small></span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav1">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav1">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item"><a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2"></i> Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'programa:lista' %}"><i class="bi bi-calendar3"></i> Programa anual</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'empresas:lista' %}"><i class="bi bi-building"></i> Empresas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'pesv:catalogo' %}"><i class="bi bi-list-check"></i> Catálogo PESV</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'auditorias:lista' %}"><i class="bi bi-clipboard2-check"></i> Auditorías</a></li>
+        <li class="nav-item"><a class="nav-link" href="{% url 'matriz' %}"><i class="bi bi-table"></i> Matriz de seguimiento</a></li>
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"><i class="bi bi-person-circle"></i> {{ user.get_full_name|default:user.username }}</a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><span class="dropdown-item-text text-muted small">{{ user.get_rol_display }}</span></li>
+            {% if user.is_staff %}<li><a class="dropdown-item" href="/admin/">Panel de administración</a></li>{% endif %}
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar sesión</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="dot-row"></div>
+{% endif %}
+
+<div class="container-fluid px-3 px-md-4 py-4">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<div class="footer-pesv">
+  {{ INSTITUCION_NOMBRE }} — {{ INSTITUCION_DEPENDENCIA }} · Sistema Integral de Gestión de Auditorías PESV
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

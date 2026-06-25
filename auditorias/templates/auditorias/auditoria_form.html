@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<h3 class="section-title">{{ titulo }}</h3>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.visita }}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Empresa auditada</label>
+          {% render_field form.empresa class="form-select" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Fecha de inicio</label>
+          {% render_field form.fecha_inicio class="form-control" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Fecha de finalización</label>
+          {% render_field form.fecha_fin class="form-control" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Hora inicio</label>
+          {% render_field form.hora_inicio class="form-control" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Hora fin</label>
+          {% render_field form.hora_fin class="form-control" %}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Lugar</label>
+          {% render_field form.lugar class="form-control" %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold">Pasos del PESV a auditar</label>
+          <div class="border rounded p-2" style="max-height:320px;overflow-y:auto;">{{ form.pasos_auditados }}</div>
+          {% if form.pasos_auditados.errors %}<div class="text-danger small">{{ form.pasos_auditados.errors }}</div>{% endif %}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold">Equipo auditor</label>
+          <div class="border rounded p-2" style="max-height:320px;overflow-y:auto;">{{ form.equipo_auditor }}</div>
+          {% if form.equipo_auditor.errors %}<div class="text-danger small">{{ form.equipo_auditor.errors }}</div>{% endif %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-pesv"><i class="bi bi-check-circle"></i> Crear auditoría</button>
+      <a href="{% url 'auditorias:lista' %}" class="btn btn-outline-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

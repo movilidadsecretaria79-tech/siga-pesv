@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<h3 class="section-title">{{ titulo }}</h3>
+<div class="card shadow-sm">
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Empresa a verificar</label>
+          {% render_field form.empresa class="form-select" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Fecha programada</label>
+          {% render_field form.fecha_programada class="form-control" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Duración estimada (horas)</label>
+          {% render_field form.duracion_horas_estimada class="form-control" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Fecha real (si ya se realizó)</label>
+          {% render_field form.fecha_real class="form-control" %}
+        </div>
+        <div class="col-md-3 mb-3">
+          <label class="form-label">Estado</label>
+          {% render_field form.estado class="form-select" %}
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold">Criterios de evaluación: pasos del PESV a evaluar</label>
+          <div class="border rounded p-2" style="max-height:280px;overflow-y:auto;">{{ form.pasos_a_evaluar }}</div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label fw-bold">Componentes específicos a evaluar (opcional)</label>
+          {% render_field form.componentes_a_evaluar class="form-select" %}
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label fw-bold">Equipo auditor</label>
+          <div class="border rounded p-2" style="max-height:280px;overflow-y:auto;">{{ form.equipo_auditor }}</div>
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label fw-bold">Instrumentos</label>
+          <div class="border rounded p-2" style="max-height:280px;overflow-y:auto;">{{ form.instrumentos }}</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Observaciones</label>
+        {% render_field form.observaciones class="form-control" %}
+      </div>
+
+      <button type="submit" class="btn btn-pesv"><i class="bi bi-check-circle"></i> Guardar</button>
+      <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancelar</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

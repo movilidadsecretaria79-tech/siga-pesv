@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Auditorías{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="section-title mb-0">Auditorías PESV</h3>
+  <a href="{% url 'auditorias:crear' %}" class="btn btn-pesv"><i class="bi bi-clipboard2-plus"></i> Nueva auditoría</a>
+</div>
+
+<div class="btn-group mb-3">
+  <a href="{% url 'auditorias:lista' %}" class="btn btn-sm btn-outline-secondary {% if not request.GET.estado %}active{% endif %}">Todas</a>
+  <a href="?estado=EN_PROCESO" class="btn btn-sm btn-outline-secondary {% if request.GET.estado == 'EN_PROCESO' %}active{% endif %}">En proceso</a>
+  <a href="?estado=FINALIZADA" class="btn btn-sm btn-outline-secondary {% if request.GET.estado == 'FINALIZADA' %}active{% endif %}">Finalizadas</a>
+  <a href="?estado=CERRADA" class="btn btn-sm btn-outline-secondary {% if request.GET.estado == 'CERRADA' %}active{% endif %}">Cerradas</a>
+</div>
+
+<div class="card shadow-sm">
+  <div class="table-responsive">
+    <table class="table table-pesv table-hover mb-0">
+      <thead><tr><th>Empresa</th><th>Fecha</th><th>Pasos auditados</th><th>No conformidades</th><th>Estado</th><th></th></tr></thead>
+      <tbody>
+      {% for a in auditorias %}
+        <tr>
+          <td><a href="{% url 'auditorias:detalle' a.pk %}">{{ a.empresa.nombre }}</a></td>
+          <td>{{ a.fecha_inicio|date:"d/m/Y" }}{% if a.fecha_fin %} - {{ a.fecha_fin|date:"d/m/Y" }}{% endif %}</td>
+          <td>{{ a.pasos_auditados.count }}</td>
+          <td>{% if a.total_no_conformidades %}<span class="badge bg-danger">{{ a.total_no_conformidades }}</span>{% else %}<span class="badge bg-success">0</span>{% endif %}</td>
+          <td><span class="badge bg-secondary">{{ a.get_estado_display }}</span></td>
+          <td><a href="{% url 'auditorias:detalle' a.pk %}" class="btn btn-sm btn-outline-primary">Ver</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-4">No hay auditorías registradas.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

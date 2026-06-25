@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}{{ titulo }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-7">
+    <h4 class="section-title">{{ titulo }}</h4>
+    <p class="text-muted">{{ empresa.nombre }}</p>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {% for field in form %}
+            <div class="mb-3">
+              <label class="form-label">{{ field.label }}</label>
+              {% if field.field.widget.input_type == "checkbox" %}
+                <div class="form-check">{% render_field field class="form-check-input" %}</div>
+              {% else %}
+                {% render_field field class="form-control" %}
+              {% endif %}
+              {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+            </div>
+          {% endfor %}
+          <button type="submit" class="btn btn-pesv"><i class="bi bi-upload"></i> Subir</button>
+          <a href="{% url 'documentos:verificacion_requisitos' empresa.pk %}" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

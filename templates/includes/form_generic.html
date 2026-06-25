@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}{{ titulo|default:"Formulario" }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <h3 class="section-title">{{ titulo }}</h3>
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+          {% endif %}
+          <div class="row">
+            {% for field in form %}
+              <div class="col-md-{{ field.field.widget.attrs.colsize|default:6 }} mb-3">
+                <label class="form-label">{{ field.label }}{% if field.field.required %} <span class="text-danger">*</span>{% endif %}</label>
+                {% if field.field.widget.input_type == "checkbox" %}
+                  <div class="form-check">
+                    {% render_field field class="form-check-input" %}
+                  </div>
+                {% else %}
+                  {% render_field field class="form-control" %}
+                {% endif %}
+                {% if field.help_text %}<div class="form-text">{{ field.help_text }}</div>{% endif %}
+                {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+          <hr>
+          <button type="submit" class="btn btn-pesv"><i class="bi bi-check-circle"></i> Guardar</button>
+          <a href="{{ cancel_url }}" class="btn btn-outline-secondary">Cancelar</a>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

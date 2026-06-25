@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}{{ empresa.nombre }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+  <div>
+    <h3 class="section-title mb-0">{{ empresa.nombre }}</h3>
+    <p class="text-muted mb-0">NIT {{ empresa.nit }} · Nivel PESV: <strong>{{ empresa.get_nivel_pesv_display }}</strong> · {{ empresa.get_tipo_organizacion_display }}</p>
+  </div>
+  <div class="btn-group">
+    <a href="{% url 'empresas:editar' empresa.pk %}" class="btn btn-outline-secondary"><i class="bi bi-pencil"></i> Editar</a>
+    <a href="{% url 'documentos:verificacion_requisitos' empresa.pk %}" class="btn btn-outline-primary"><i class="bi bi-folder-check"></i> Verificación de requisitos</a>
+    <a href="{% url 'auditorias:crear' %}?empresa={{ empresa.pk }}" class="btn btn-pesv"><i class="bi bi-clipboard2-plus"></i> Nueva auditoría</a>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-3"><div class="card card-kpi"><div class="card-body"><div class="kpi-num">{{ empresa.numero_sedes }}</div><div>Sedes</div></div></div></div>
+  <div class="col-md-3"><div class="card card-kpi"><div class="card-body"><div class="kpi-num">{{ vehiculos|length }}</div><div>Vehículos registrados</div></div></div></div>
+  <div class="col-md-3"><div class="card card-kpi"><div class="card-body"><div class="kpi-num">{{ conductores|length }}</div><div>Conductores registrados</div></div></div></div>
+  <div class="col-md-3"><div class="card card-kpi"><div class="card-body"><div class="kpi-num">{{ auditorias|length }}</div><div>Auditorías realizadas</div></div></div></div>
+</div>
+
+<div class="row">
+  <div class="col-lg-6">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <strong>Datos generales</strong>
+      </div>
+      <div class="card-body small">
+        <p><strong>Representante legal:</strong> {{ empresa.representante_legal|default:"—" }}</p>
+        <p><strong>Dirección:</strong> {{ empresa.direccion|default:"—" }} · <strong>Tel:</strong> {{ empresa.telefono|default:"—" }}</p>
+        <p><strong>Email:</strong> {{ empresa.email_contacto|default:"—" }}</p>
+        <hr>
+        <p class="mb-1"><strong>Líder PESV:</strong> {{ empresa.nombre_lider_pesv|default:"No designado" }}</p>
+        <p class="mb-1"><strong>Cargo:</strong> {{ empresa.cargo_lider_pesv|default:"—" }}</p>
+        <p class="mb-0"><strong>Contacto líder:</strong> {{ empresa.telefono_lider_pesv|default:"—" }} / {{ empresa.email_lider_pesv|default:"—" }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card mb-4 shadow-sm">
+      <div class="card-header"><strong>Auditorías recientes</strong></div>
+      <div class="list-group list-group-flush">
+        {% for a in auditorias %}
+        <a href="{% url 'auditorias:detalle' a.pk %}" class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ a.fecha_inicio|date:"d/m/Y" }} — {{ a.get_estado_display }}</span>
+          <span class="badge bg-secondary">{{ a.pasos_auditados.count }} pasos</span>
+        </a>
+        {% empty %}
+        <div class="list-group-item text-muted">Sin auditorías registradas aún.</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong><i class="bi bi-truck"></i> Vehículos</strong>
+    <a href="{% url 'empresas:vehiculo_crear' empresa.pk %}" class="btn btn-sm btn-pesv">+ Vehículo</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead><tr><th>Placa</th><th>Tipo</th><th>Propiedad</th><th>SOAT</th><th>RTM</th><th></th></tr></thead>
+      <tbody>
+      {% for v in vehiculos %}
+        <tr>
+          <td>{{ v.placa }}</td><td>{{ v.tipo_vehiculo }}</td><td>{{ v.get_propiedad_display }}</td>
+          <td>{% if v.soat_vencido %}<span class="badge bg-danger">Vencido {{ v.soat_vigencia|date:"d/m/Y" }}</span>{% else %}{{ v.soat_vigencia|date:"d/m/Y"|default:"—" }}{% endif %}</td>
+          <td>{% if v.rtm_vencida %}<span class="badge bg-danger">Vencida {{ v.rtm_vigencia|date:"d/m/Y" }}</span>{% else %}{{ v.rtm_vigencia|date:"d/m/Y"|default:"—" }}{% endif %}</td>
+          <td><a href="{% url 'empresas:vehiculo_editar' v.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="text-center text-muted py-3">Sin vehículos registrados.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card mb-4 shadow-sm">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong><i class="bi bi-person-badge"></i> Gestión de conductores</strong>
+    <a href="{% url 'empresas:conductor_crear' empresa.pk %}" class="btn btn-sm btn-pesv">+ Conductor</a>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-sm mb-0">
+      <thead><tr><th>Conductor</th><th>Documento</th><th>Licencia vence</th><th>Examen médico vence</th><th>Comparendos</th><th>Reincidente</th><th>Alertas</th><th></th></tr></thead>
+      <tbody>
+      {% for c in conductores %}
+        <tr>
+          <td><a href="{% url 'empresas:conductor_detalle' c.pk %}">{{ c.nombres_apellidos }}</a></td>
+          <td>{{ c.numero_documento }}</td>
+          <td class="{% if c.licencia_vencida %}text-danger fw-bold{% endif %}">{{ c.licencia_vigencia|date:"d/m/Y"|default:"—" }}</td>
+          <td class="{% if c.examen_medico_vencido %}text-danger fw-bold{% endif %}">{{ c.examen_medico_vigencia|date:"d/m/Y"|default:"—" }}</td>
+          <td>{% if c.comparendos_verificado %}<span class="badge bg-success">Verificado</span>{% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}</td>
+          <td>{% if c.es_reincidente %}<span class="badge bg-danger">Sí</span>{% else %}No{% endif %}</td>
+          <td>{% if c.alertas %}<span class="badge bg-danger">{{ c.alertas|length }}</span>{% else %}<span class="badge bg-success">OK</span>{% endif %}</td>
+          <td><a href="{% url 'empresas:conductor_editar' c.pk %}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" class="text-center text-muted py-3">Sin conductores registrados.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

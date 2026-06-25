@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ conductor.nombres_apellidos }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="section-title mb-0">{{ conductor.nombres_apellidos }}</h3>
+  <a href="{% url 'empresas:conductor_editar' conductor.pk %}" class="btn btn-pesv"><i class="bi bi-pencil"></i> Editar</a>
+</div>
+<p class="text-muted">{{ conductor.empresa.nombre }} · Documento {{ conductor.numero_documento }} · {{ conductor.tipo_vinculacion|default:"—" }}</p>
+
+{% if conductor.alertas %}
+<div class="alert alert-danger"><strong>Alertas:</strong> {{ conductor.alertas|join:", " }}</div>
+{% endif %}
+
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card mb-3"><div class="card-header">1. Licencia de conducción</div>
+      <div class="card-body small">
+        Categoría: {{ conductor.licencia_categoria|default:"—" }}<br>
+        Vigencia: {{ conductor.licencia_vigencia|date:"d/m/Y"|default:"—" }} {% if conductor.licencia_vencida %}<span class="badge bg-danger">VENCIDA</span>{% endif %}<br>
+        {% if conductor.licencia_documento %}<a href="{{ conductor.licencia_documento.url }}" target="_blank">Ver documento</a>{% else %}<span class="text-muted">Sin documento cargado</span>{% endif %}
+      </div>
+    </div>
+    <div class="card mb-3"><div class="card-header">2. Examen médico ocupacional</div>
+      <div class="card-body small">
+        Fecha: {{ conductor.examen_medico_fecha|date:"d/m/Y"|default:"—" }} · Resultado: {{ conductor.get_examen_medico_resultado_display|default:"—" }}<br>
+        Vigencia: {{ conductor.examen_medico_vigencia|date:"d/m/Y"|default:"—" }} {% if conductor.examen_medico_vencido %}<span class="badge bg-danger">VENCIDO</span>{% endif %}<br>
+        {% if conductor.examen_medico_documento %}<a href="{{ conductor.examen_medico_documento.url }}" target="_blank">Ver documento</a>{% else %}<span class="text-muted">Sin documento cargado</span>{% endif %}
+      </div>
+    </div>
+    <div class="card mb-3"><div class="card-header">3. Comparendos e infracciones</div>
+      <div class="card-body small">
+        {% if conductor.comparendos_verificado %}<span class="badge bg-success">Verificado</span>{% else %}<span class="badge bg-warning text-dark">Pendiente</span>{% endif %}
+        el {{ conductor.comparendos_fecha_verificacion|date:"d/m/Y"|default:"—" }}<br>
+        {{ conductor.comparendos_observaciones|default:"" }}<br>
+        {% if conductor.comparendos_soporte %}<a href="{{ conductor.comparendos_soporte.url }}" target="_blank">Ver soporte</a>{% endif %}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card mb-3"><div class="card-header">4. Competencias para movilidad segura</div>
+      <div class="card-body small">
+        Fecha evaluación: {{ conductor.competencias_fecha_evaluacion|date:"d/m/Y"|default:"—" }}<br>
+        Resultado: {{ conductor.competencias_resultado|default:"—" }}<br>
+        {% if conductor.competencias_documento %}<a href="{{ conductor.competencias_documento.url }}" target="_blank">Ver documento</a>{% else %}<span class="text-muted">Sin documento cargado</span>{% endif %}
+      </div>
+    </div>
+    <div class="card mb-3"><div class="card-header">5. Jornada laboral y fatiga</div>
+      <div class="card-body small">
+        Horas promedio/día: {{ conductor.jornada_horas_promedio_dia|default:"—" }}<br>
+        Controles: {{ conductor.fatiga_controles_aplicados|default:"—" }}<br>
+        {% if conductor.fatiga_soporte %}<a href="{{ conductor.fatiga_soporte.url }}" target="_blank">Ver soporte</a>{% endif %}
+      </div>
+    </div>
+    <div class="card mb-3"><div class="card-header">6. Reincidencia</div>
+      <div class="card-body small">
+        {% if conductor.es_reincidente %}<span class="badge bg-danger">Conductor reincidente</span>{% else %}<span class="badge bg-success">Sin reincidencia</span>{% endif %}<br>
+        {{ conductor.detalle_reincidencia|default:"" }}<br>
+        <em>Plan de seguimiento:</em> {{ conductor.plan_seguimiento_reincidencia|default:"No aplica" }}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
